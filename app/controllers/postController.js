@@ -5,13 +5,7 @@ import User from "../models/user.js";
 // Populates the user field so we can see the username instead of just the ID
 export const getAllPosts = async (req, res, next) => {
     try {
-        const posts = await Post.find()
-            .select("-__v")
-            .populate("user", "username");
-        res.status(200).json({
-            success: true,
-            data: posts,
-        });
+        res.status(200).json(res.results);
     } catch (err) {
         next(err);
     }
@@ -67,6 +61,11 @@ export const createPost = async (req, res, next) => {
             });
         }
         const post = await Post.create(req.body);
+        await User.findByIdAndUpdate(
+            user,
+            { $addToSet: { posts: post._id } },
+            { new: true }
+        );
         res.status(201).json({
             success: true,
             data: post,

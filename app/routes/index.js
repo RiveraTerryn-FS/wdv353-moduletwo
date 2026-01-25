@@ -1,6 +1,9 @@
 import express from "express";
 import userRouter from "./userRouter.js";
 import postRouter from "./postRouter.js";
+import { queryString } from "../helpers/queryString.js";
+import Post from "../models/post.js";
+import User from "../models/user.js";
 
 const router = express.Router();
 
@@ -11,7 +14,19 @@ router.get("/", (req, res) => {
   });
 });
 
-router.use("/users", userRouter);
-router.use("/posts", postRouter);
+
+router.use("/users", queryString(User, 
+  {
+    path: "posts",
+    select: "title content",
+  },
+), userRouter);
+
+router.use("/posts", queryString(Post, 
+  {
+    path: "user",
+    select: "username",
+  },
+), postRouter);
 
 export default router;

@@ -19,11 +19,16 @@ const userSchema = new mongoose.Schema(
       type: Number,
       min: 13,
     },
-
     active: {
       type: Boolean,
       default: true,
     },
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      }
+    ]
   },
   { timestamps: true }
 );
