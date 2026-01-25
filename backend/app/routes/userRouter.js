@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllUsers);
-router.post("/", createUser);
+//router.post("/", createUser); <-- no longer needed (auth has register and login)
 router.get("/:userId", getUser);
 router.put("/:userId", editUser);
 router.delete("/:userId", deleteUser);

@@ -10,6 +10,7 @@ export const getAllUsers = async (req, res, next) => {
 };
 // Create a new user
 // Expects the required user fields in the request body
+// NO LONGER IN USE / OUTDATED
 export const createUser = async (req, res, next) => {
     try {
         const user = await User.create(req.body);

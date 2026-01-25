@@ -1,34 +1,40 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
+import dotenv from "dotenv";
 import routeHandler from "./routes/index.js";
+import cookieParser from "cookie-parser";
+dotenv.config();
 
 const app = express();
 
+app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-// ---------- API  ----------
+app.set("query parser", "extended");
+app.use(cookieParser());
+
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "API up and running",
     success: true,
+    message: "POSTIT API running",
   });
 });
-// ---------- API ROUTES ----------
+
 app.use("/api/v1", routeHandler);
-// ---------- 404 HANDLER ---------
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: "Route not found",
-    path: req.originalUrl,
   });
 });
-// ---------- ERROR HANDLER ----------
+
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
-    error: err.message,
-    message: "Server Error",
+    error: err.message || "Server error",
   });
 });
+
 export default app;

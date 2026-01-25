@@ -1,7 +1,8 @@
 import express from "express";
 import userRouter from "./userRouter.js";
 import postRouter from "./postRouter.js";
-import { queryString } from "../helpers/queryString.js";
+import authRouter from "./authRouter.js";
+import { queryString } from "../middleware/queryString.js";
 import Post from "../models/post.js";
 import User from "../models/user.js";
 
@@ -14,6 +15,7 @@ router.get("/", (req, res) => {
   });
 });
 
+router.use("/auth", authRouter);
 
 router.use("/users", queryString(User, 
   {

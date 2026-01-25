@@ -1,13 +1,15 @@
 export const queryString = (model, populate) => async (req, res, next) => {
     try {
-        const {  page = 1, limit = 20, select, sort, ...filters } = req.query;
-        // Convert
+        const { page = 1, limit = 20, select, sort, ...filters } = req.query;
+        // Filter
         let queryStr = JSON.stringify(filters);
-            queryStr = queryStr.replace(
+        queryStr = queryStr.replace(
             /\b(gt|gte|lt|lte)\b/g,
             match => `$${match}`
         );
-        let query = model.find(JSON.parse(queryStr));
+        const mFilters = JSON.parse(queryStr);        
+
+        let query = model.find(mFilters);
         // Select
         if (select)
             query = query.select(select.split(",").join(" "));
@@ -21,7 +23,6 @@ export const queryString = (model, populate) => async (req, res, next) => {
         if (populate)
             query = query.populate(populate);
         const results = await query;
-
         res.results = {
             success: true,
             count: results.length,

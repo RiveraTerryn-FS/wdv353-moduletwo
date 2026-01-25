@@ -36,43 +36,42 @@ export const getPost = async (req, res, next) => {
 // Create a new post
 // Verifies the user exists before allowing the post to be created
 export const createPost = async (req, res, next) => {
-    try {
-        const { user } = req.body;
-        // Make sure a user ID was provided
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                error: "User field is required",
-            });
-        }
-        // Check that the user ID is a valid MongoDB ObjectId
-        if (!mongoose.Types.ObjectId.isValid(user)) {
-            return res.status(400).json({
-                success: false,
-                error: "Invalid user ID format",
-            });
-        }
-        // Confirm the user exists in the database
-        const userExists = await User.findById(user);
-        if (!userExists) {
-            return res.status(400).json({
-                success: false,
-                error: "User does not exist",
-            });
-        }
-        const post = await Post.create(req.body);
-        await User.findByIdAndUpdate(
-            user,
-            { $addToSet: { posts: post._id } },
-            { new: true }
-        );
-        res.status(201).json({
-            success: true,
-            data: post,
-        });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const userId = req.user.id;
+        const { title, content } = req.body;
+
+		if (!mongoose.Types.ObjectId.isValid(userId)) {
+			return res.status(400).json({
+				success: false,
+				error: "Invalid user ID",
+			});
+		}
+		const userExists = await User.findById(userId);
+		if (!userExists) {
+			return res.status(401).json({
+				success: false,
+				error: "User not found",
+			});
+		}
+
+		const post = await Post.create({
+			content: content,
+            title: title,
+			user: userId,
+		});
+
+		await User.findByIdAndUpdate(
+			userId,
+			{ $addToSet: { posts: post._id } }
+		);
+
+		res.status(201).json({
+			success: true,
+			data: post,
+		});
+	} catch (err) {
+		next(err);
+	}
 };
 // Update an existing post
 // Applies updates using the post ID from the route params
